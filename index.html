@@ -1,0 +1,404 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Tic Tac Toe</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#050816,#0a1f44,#38003c);
+    overflow:hidden;
+    position:relative;
+}
+
+/* Background Decorations */
+
+body::before{
+    content:"O";
+    position:absolute;
+    left:5%;
+    top:8%;
+    font-size:180px;
+    font-weight:bold;
+    color:#00d9ff;
+    opacity:0.25;
+    text-shadow:0 0 40px #00d9ff;
+}
+
+body::after{
+    content:"✕";
+    position:absolute;
+    right:5%;
+    top:8%;
+    font-size:180px;
+    color:#ff2e88;
+    opacity:0.25;
+    text-shadow:0 0 40px #ff2e88;
+}
+
+.container{
+    text-align:center;
+    z-index:10;
+}
+
+h1{
+    color:white;
+    font-size:4rem;
+    letter-spacing:5px;
+    margin-bottom:10px;
+
+    text-shadow:
+    0 0 10px #00d9ff,
+    0 0 25px #00d9ff,
+    0 0 40px #ff2e88;
+}
+
+.subtitle{
+    color:white;
+    letter-spacing:4px;
+    margin-bottom:30px;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(3,120px);
+    gap:8px;
+    justify-content:center;
+}
+
+.cell{
+    width:120px;
+    height:120px;
+    border-radius:15px;
+    border:2px solid rgba(255,255,255,0.2);
+
+    background:rgba(255,255,255,0.08);
+
+    color:white;
+    font-size:60px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+    0 0 15px #00d9ff,
+    inset 0 0 15px rgba(0,217,255,0.3);
+
+    transition:.3s;
+}
+
+.cell:hover{
+    transform:scale(1.05);
+
+    box-shadow:
+    0 0 20px #ff2e88,
+    0 0 40px #ff2e88;
+}
+
+#status{
+    margin-top:25px;
+    color:white;
+    font-size:24px;
+    text-shadow:0 0 10px white;
+}
+
+#restart{
+    margin-top:25px;
+    padding:14px 35px;
+    border:none;
+    border-radius:40px;
+    cursor:pointer;
+
+    font-size:18px;
+    color:white;
+
+    background:
+    linear-gradient(
+    90deg,
+    #00d9ff,
+    #8a2be2
+    );
+
+    box-shadow:
+    0 0 20px #00d9ff,
+    0 0 35px #8a2be2;
+
+    transition:.3s;
+}
+
+#restart:hover{
+    transform:scale(1.08);
+}
+
+@media (max-width: 500px){
+
+h1{
+    font-size:2.5rem;
+}
+
+.subtitle{
+    font-size:14px;
+}
+
+.board{
+    grid-template-columns:repeat(3,90px);
+}
+
+.cell{
+    width:90px;
+    height:90px;
+    font-size:45px;
+}
+
+#status{
+    font-size:18px;
+}
+
+#restart{
+    padding:12px 25px;
+    font-size:16px;
+}
+
+body::before,
+body::after{
+    font-size:100px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>TIC TAC TOE</h1>
+
+<div class="subtitle">
+LET THE GAME BEGIN!
+</div>
+
+<div class="board">
+
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+
+</div>
+
+<div id="status">
+Player X Turn
+</div>
+
+<button id="restart">
+Restart Game
+</button>
+
+</div>
+
+<script>
+
+const cells =
+document.querySelectorAll(".cell");
+
+const statusText =
+document.getElementById("status");
+
+const restartBtn =
+document.getElementById("restart");
+
+let currentPlayer = "X";
+let gameRunning = true;
+
+const winConditions = [
+
+[0,1,2],
+[3,4,5],
+[6,7,8],
+
+[0,3,6],
+[1,4,7],
+[2,5,8],
+
+[0,4,8],
+[2,4,6]
+
+];
+
+cells.forEach(cell=>{
+cell.addEventListener(
+"click",
+cellClicked
+);
+});
+
+restartBtn.addEventListener(
+"click",
+restartGame
+);
+
+function cellClicked(){
+
+if(
+this.textContent !== ""
+||
+!gameRunning
+){
+return;
+}
+
+this.textContent =
+currentPlayer;
+
+if(currentPlayer==="X"){
+this.style.color="#ff2e88";
+this.style.textShadow=
+"0 0 20px #ff2e88";
+}
+else{
+this.style.color="#00d9ff";
+this.style.textShadow=
+"0 0 20px #00d9ff";
+}
+
+checkWinner();
+
+}
+
+function checkWinner(){
+
+let won = false;
+
+for(
+let i=0;
+i<winConditions.length;
+i++
+){
+
+let condition =
+winConditions[i];
+
+let a =
+cells[
+condition[0]
+].textContent;
+
+let b =
+cells[
+condition[1]
+].textContent;
+
+let c =
+cells[
+condition[2]
+].textContent;
+
+if(
+a==="" ||
+b==="" ||
+c===""){
+continue;
+}
+
+if(
+a===b &&
+b===c
+){
+won=true;
+break;
+}
+
+}
+
+if(won){
+
+statusText.innerHTML =
+"🎉 Player "
++
+currentPlayer
++
+" Wins!";
+
+gameRunning=false;
+
+return;
+}
+
+if(
+[...cells].every(
+cell =>
+cell.textContent!==""
+)
+){
+
+statusText.innerHTML =
+"🤝 Draw Game";
+
+gameRunning=false;
+
+return;
+}
+
+currentPlayer =
+currentPlayer==="X"
+?
+"O"
+:
+"X";
+
+statusText.innerHTML =
+"Player "
++
+currentPlayer
++
+" Turn";
+
+}
+
+function restartGame(){
+
+cells.forEach(cell=>{
+
+cell.textContent="";
+
+cell.style.color="white";
+
+cell.style.textShadow="none";
+
+});
+
+currentPlayer="X";
+
+gameRunning=true;
+
+statusText.innerHTML=
+"Player X Turn";
+
+}
+
+</script>
+
+</body>
+</html>
+```
